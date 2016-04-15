@@ -15,8 +15,8 @@ __version__ = '0.0.1'
 import argparse
 import numpy as np
 import pandas as pd
-import collections
 
+from collections import OrderedDict
 from sklearn import linear_model
 
 TRAIN_FILE = "data/training.csv"
@@ -45,7 +45,8 @@ def predict(model, ids, X):
     """predict. """
 
     Y = model.predict(X)
-    return pd.DataFrame(data = collections.OrderedDict([( 'RowId', ids), ('Location', Y )]))
+    predictions = OrderedDict([( 'RowId', ids), ('Location', Y )])
+    return pd.DataFrame(data = predictions)
 
 
 def to_image(str_images):
