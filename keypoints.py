@@ -47,8 +47,12 @@ def predict(model, ids, X):
     Y = model.predict(X)
     return pd.DataFrame(data = collections.OrderedDict([( 'RowId', ids), ('Location', Y )]))
 
+
 def to_image(str_images):
+    """convert string representation to vector"""
+
     return pd.Series(map(lambda v: float(v), str_images.split()))
+
 
 def df_train(filename = TRAIN_FILE, sample = None):
     """the train set. """
