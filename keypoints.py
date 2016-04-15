@@ -52,10 +52,11 @@ def df_train(filename = TRAIN_FILE):
     """the train set. """
 
     df = pd.read_csv(filename, header = 0)
-    X = df.drop(['ID', 'TARGET'], axis = 1)
-    Y = df['TARGET']
+    df = df.sample(100)
+    Y = df['left_eye_center_x'].apply(lambda v: float(v))
+    X = df['Image'].apply(lambda s: pd.Series(map(lambda v: float(v), s.split())))
 
-    return (X, Y)
+    return (X, Y, df)
 
 
 def df_test(filename = TEST_FILE):
@@ -64,6 +65,7 @@ def df_test(filename = TEST_FILE):
     df = pd.read_csv(filename, header = 0)
     ids = df['ID']
     X = df.drop(['ID'], axis = 1)
+
 
     return (ids, X)
 
