@@ -15,6 +15,7 @@ __version__ = '0.0.1'
 import argparse
 import numpy as np
 import pandas as pd
+import collections
 
 from sklearn import linear_model
 
@@ -34,7 +35,7 @@ def run(config):
 def train(X, Y):
     """train a model. """
 
-    model = linear_model.LogisticRegression()
+    model = linear_model.LinearRegression()
     model.fit(X, Y)
 
     return model
@@ -44,28 +45,31 @@ def predict(model, ids, X):
     """predict. """
 
     Y = model.predict(X)
+    return pd.DataFrame(data = collections.OrderedDict([( 'RowId', ids), ('Location', Y )]))
 
-    return pd.DataFrame(data = { 'ID': ids, 'TARGET': Y })
+def to_image(str_images):
+    return pd.Series(map(lambda v: float(v), str_images.split()))
 
-
-def df_train(filename = TRAIN_FILE):
+def df_train(filename = TRAIN_FILE, sample = None):
     """the train set. """
 
     df = pd.read_csv(filename, header = 0)
-    df = df.sample(100)
-    Y = df['left_eye_center_x'].apply(lambda v: float(v))
-    X = df['Image'].apply(lambda s: pd.Series(map(lambda v: float(v), s.split())))
+    if sample is not None:
+        df = df.sample(sample)
 
-    return (X, Y, df)
+    df = df.dropna()
+    Y = df['left_eye_center_x'].apply(lambda v: float(v))
+    X = df['Image'].apply(to_image)
+
+    return (X, Y)
 
 
 def df_test(filename = TEST_FILE):
     """the test set. """
 
     df = pd.read_csv(filename, header = 0)
-    ids = df['ID']
-    X = df.drop(['ID'], axis = 1)
-
+    ids = df['ImageId']
+    X = df['Image'].apply(to_image)
 
     return (ids, X)
 
