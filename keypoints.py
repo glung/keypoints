@@ -63,7 +63,7 @@ def df_train(filename = TRAIN_FILE, sample = None):
         df = df.sample(sample)
 
     df = df.dropna()
-    Y = df['left_eye_center_x'].apply(lambda v: float(v))
+    Y = df.drop('Image', axis = 1)
     X = df['Image'].apply(to_image)
 
     return (X, Y)
@@ -72,11 +72,8 @@ def df_train(filename = TRAIN_FILE, sample = None):
 def df_test(filename = TEST_FILE):
     """the test set. """
 
-    df = pd.read_csv(filename, header = 0)
-    ids = df['ImageId']
-    X = df['Image'].apply(to_image)
-
-    return (ids, X)
+    df = pd.read_csv(filename, header = 0, index_col = 'ImageId')
+    return df['Image'].apply(to_image)
 
 
 def cfg():
