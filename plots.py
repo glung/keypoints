@@ -15,7 +15,7 @@ __version__ = '0.0.1'
 import matplotlib.pyplot as plt
 
 SIDE = 96
-N_SIDE = 4
+N_SIDE = 6
 
 def show_imgs(X, Y):
     fig = plt.figure(figsize=(16, 16))
