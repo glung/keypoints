@@ -22,15 +22,46 @@ from sklearn import linear_model
 TRAIN_FILE = "data/training.csv"
 TEST_FILE = "data/test.csv"
 PRED_FILE = "data/predictions.csv"
+LOOKUP_FILE = "data/IdLookupTable.csv"
 
 
 def run(config):
     """run prediction. """
 
-    model = train(*df_train(config['train']))
-    df = predict(model, *df_test(config['test']))
-    df.to_csv(config['predictions'], index = False)
+    # learn, predict
+    Xtrain, Ytrain, header = df_train(config['train'])
+    model = train(Xtrain, Ytrain)
+    Ypred = predict(model, df_test(config['test']))
 
+    # submit
+    lookup = df_lookup(header, config['lookup'])
+    S = submission_format(Ypred, lookup)
+    S.to_csv(config['predictions'], index = False)
+
+
+def submission_format(Y, lookup):
+    """
+    convert to the right format for submission. joins id lookup table to
+    the predictions like this:
+
+    prediction: (imageid, featureid, location) ­ unstacks first.
+    lookup: (rowid, imageid, featureid)
+    joined: (rowid, location)
+    """
+
+    keys = pd.DataFrame(Y.transpose().unstack())
+    keys.reset_index(inplace = True)
+    keys.columns = ['ImageId', 'FeatureId', 'Location']
+    keys.set_index(['ImageId', 'FeatureId'], inplace = True)
+
+    joined = lookup.join(keys, how = 'left').reset_index()
+
+    predictions = OrderedDict([
+        ('RowId',    joined['RowId']),
+        ('Location', joined['Location'])
+    ])
+
+    return pd.DataFrame(data = predictions)
 
 def train(X, Y):
     """train a model. """
@@ -41,12 +72,10 @@ def train(X, Y):
     return model
 
 
-def predict(model, ids, X):
+def predict(model, X):
     """predict. """
 
-    Y = model.predict(X)
-    predictions = OrderedDict([( 'RowId', ids), ('Location', Y )])
-    return pd.DataFrame(data = predictions)
+    return pd.DataFrame(model.predict(X))
 
 
 def to_image(str_images):
@@ -65,8 +94,10 @@ def df_train(filename = TRAIN_FILE, sample = None):
     df = df.dropna()
     Y = df.drop('Image', axis = 1)
     X = df['Image'].apply(to_image)
+    header = Y.columns.values
 
-    return (X, Y)
+
+    return (X, Y, header)
 
 
 def df_test(filename = TEST_FILE):
@@ -76,6 +107,17 @@ def df_test(filename = TEST_FILE):
     return df['Image'].apply(to_image)
 
 
+def df_lookup(header, filename = LOOKUP_FILE):
+    """read mapping file and covert to (row id, image id, feature id). """
+
+    lookup = dict((y, x) for x, y in zip(range(0,30), header))
+    df = pd.read_csv(filename, header = 0, index_col = 'RowId')
+    df['FeatureId'] = df.FeatureName.apply(lambda name: lookup[name] )
+    df = df.drop(['FeatureName', 'Location'], axis = 1).reset_index()
+
+    return df.set_index(['ImageId', 'FeatureId'])
+
+
 def cfg():
     """load the configuration"""
 
@@ -83,6 +125,7 @@ def cfg():
     parser.add_argument('--train',       default=TRAIN_FILE)
     parser.add_argument('--test',        default=TEST_FILE)
     parser.add_argument('--predictions', default=PRED_FILE)
+    parser.add_argument('--lookup',      default=LOOKUP_FILE)
 
     return vars(parser.parse_args())
 
