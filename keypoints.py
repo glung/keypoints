@@ -83,8 +83,16 @@ def train(X, Y):
 def predict(model, X):
     """predict. """
 
-    return pd.DataFrame(model.predict(X))
+    return pd.DataFrame(crop(model.predict(X)), index = X.index)
 
+
+def crop(df):
+    """crop to min and max"""
+
+    df[df > 96] = 96
+    df[df < 0] = 0
+
+    return df
 
 def to_image(str_images):
     """convert string representation to vector"""
