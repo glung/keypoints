@@ -49,12 +49,7 @@ def submission_format(Y, lookup):
     joined: (rowid, location)
     """
 
-    keys = pd.DataFrame(Y.transpose().unstack())
-    keys.reset_index(inplace = True)
-    keys.columns = ['ImageId', 'FeatureId', 'Location']
-    keys.set_index(['ImageId', 'FeatureId'], inplace = True)
-
-    joined = lookup.join(keys, how = 'left').reset_index()
+    joined = lookup.join(unstacked_predictions(Y)).reset_index()
 
     predictions = OrderedDict([
         ('RowId',    joined['RowId']),
@@ -62,6 +57,19 @@ def submission_format(Y, lookup):
     ])
 
     return pd.DataFrame(data = predictions)
+
+
+def unstacked_predictions(Y):
+    """
+    unstack predictions to prepare for join with lookup table.
+    """
+
+    keys = pd.DataFrame(Y.transpose().unstack())
+    keys.reset_index(inplace = True)
+    keys.columns = ['ImageId', 'FeatureId', 'Location']
+
+    return keys.set_index(['ImageId', 'FeatureId'])
+
 
 def train(X, Y):
     """train a model. """
@@ -110,7 +118,7 @@ def df_test(filename = TEST_FILE):
 def df_lookup(header, filename = LOOKUP_FILE):
     """read mapping file and covert to (row id, image id, feature id). """
 
-    lookup = dict((y, x) for x, y in zip(range(0,30), header))
+    lookup = dict(zip(header, range(0,30)))
     df = pd.read_csv(filename, header = 0, index_col = 'RowId')
     df['FeatureId'] = df.FeatureName.apply(lambda name: lookup[name] )
     df = df.drop(['FeatureName', 'Location'], axis = 1).reset_index()
