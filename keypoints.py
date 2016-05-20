@@ -18,6 +18,7 @@ import pandas as pd
 
 from collections import OrderedDict
 from sklearn import linear_model
+from sklearn import cross_validation as cv, metrics, feature_selection
 
 TRAIN_FILE = "data/training.csv"
 TEST_FILE = "data/test.csv"

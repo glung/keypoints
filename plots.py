@@ -31,3 +31,15 @@ def show_img(x, y, axis):
     img = x.reshape(SIDE, SIDE)
     axis.imshow(img, cmap=plt.cm.gray)
     axis.scatter(y[0::2], y[1::2], marker = '.', s = 10, color = 'red')
+
+
+def show_model(model, header):
+    """show model coefficients"""
+
+    fig = plt.figure(figsize=(16, 16))
+    coefs = model.coef_
+
+    for i, c in  enumerate(coefs):
+        ax = fig.add_subplot(6, 5, i + 1, xticks=[], yticks=[])
+        plt.title(header[i])
+        ax.imshow(c.reshape(SIDE, SIDE))
