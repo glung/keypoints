@@ -94,6 +94,7 @@ def crop(df):
 
     return df
 
+
 def to_image(str_images):
     """convert string representation to vector"""
 
