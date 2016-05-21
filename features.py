@@ -20,5 +20,3 @@ def image_normalize(img):
     """equalize histogram. """
 
     return exposure.equalize_hist(img.reshape(SIDE, SIDE)).flatten()
-
-
