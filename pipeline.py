@@ -58,15 +58,10 @@ class Pipeline():
     def run(self):
         """run the pipeline. """
 
-        # learn, predict
         Xtrain, Ytrain, header = data.df_train(self.train_file)
         model = self.train(Xtrain, Ytrain)
         Ypred = self.predict(model, data.df_test(self.test_file))
-
-        # submit
-        lookup = data.df_lookup(header, self.lookup_file)
-        S = submit.submission(Ypred, lookup)
-        S.to_csv(self.path(PRED_FILE), index = False)
+        self.submit(header, Ypred)
 
 
     def train(self, X, Y):
@@ -82,6 +77,14 @@ class Pipeline():
         """predict. """
 
         return pd.DataFrame(features.crop(model.predict(X)), index = X.index)
+
+
+    def submit(self, header, Ypred):
+        """generate submission file. """
+
+        lookup = data.df_lookup(header, self.lookup_file)
+        S = submit.submission(Ypred, lookup)
+        S.to_csv(self.path(PRED_FILE), index = False)
 
 
     def path(self, filename):
