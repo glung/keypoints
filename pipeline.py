@@ -11,16 +11,19 @@
 
 __version__ = '0.0.1'
 
+import os
+import time
+
 import numpy as np
 import pandas as pd
 
-from collections import OrderedDict
 from sklearn import linear_model
 
 import features
 import data
+import submit
 
-PRED_FILE = "data/predictions.csv"
+PRED_FILE = "predictions.csv"
 
 
 class Pipeline():
@@ -30,83 +33,60 @@ class Pipeline():
 
     def __init__(
         self,
-        train,
-        test,
-        lookup,
-        predictions):
+        train_file,
+        test_file,
+        lookup_file,
+        results_dir,
+        key = None):
 
-        self.train = train
-        self.test = test
-        self.lookup = lookup
-        self.predictions = predictions
+        self.train_file = train_file
+        self.test_file = test_file
+        self.lookup_file = lookup_file
+        self.results_dir = results_dir
+        self.key = key
+
+        if self.key is None:
+            self.key = str(time.time())
+
+        if not os.path.exists(self.results_dir):
+            os.makedirs(self.results_dir)
+
+        if not os.path.exists(self.build_dir()):
+            os.makedirs(self.build_dir())
 
 
     def run(self):
         """run the pipeline. """
 
         # learn, predict
-        Xtrain, Ytrain, header = data.df_train(self.train)
-        model = train(Xtrain, Ytrain)
-        Ypred = predict(model, data.df_test(self.test))
+        Xtrain, Ytrain, header = data.df_train(self.train_file)
+        model = self.train(Xtrain, Ytrain)
+        Ypred = self.predict(model, data.df_test(self.test_file))
 
         # submit
-        lookup = data.df_lookup(header, self.lookup)
-        S = submission_format(Ypred, lookup)
-        S.to_csv(self.predictions, index = False)
+        lookup = data.df_lookup(header, self.lookup_file)
+        S = submit.submission(Ypred, lookup)
+        S.to_csv(self.path(PRED_FILE), index = False)
 
 
-def submission_format(Y, lookup):
-    """
-    convert to the right format for submission. joins id lookup table to
-    the predictions like this:
+    def train(self, X, Y):
+        """train a model. """
 
-    prediction: (imageid, featureid, location) ­ unstacks first.
-    lookup: (rowid, imageid, featureid)
-    joined: (rowid, location)
-    """
+        model = linear_model.LinearRegression()
+        model.fit(X, Y)
 
-    joined = lookup.join(unstacked_predictions(Y)).reset_index()
-
-    predictions = OrderedDict([
-        ('RowId',    joined['RowId']),
-        ('Location', joined['Location'])
-    ])
-
-    return pd.DataFrame(data = predictions)
+        return model
 
 
-def unstacked_predictions(Y):
-    """
-    unstack predictions to prepare for join with lookup table.
-    """
+    def predict(self, model, X):
+        """predict. """
 
-    keys = pd.DataFrame(Y.transpose().unstack())
-    keys.reset_index(inplace = True)
-    keys.columns = ['ImageId', 'FeatureId', 'Location']
-
-    return keys.set_index(['ImageId', 'FeatureId'])
+        return pd.DataFrame(features.crop(model.predict(X)), index = X.index)
 
 
-def train(X, Y):
-    """train a model. """
-
-    model = linear_model.LinearRegression()
-    model.fit(X, Y)
-
-    return model
+    def path(self, filename):
+        return '%s/%s' % (self.build_dir(), filename)
 
 
-def predict(model, X):
-    """predict. """
-
-    return pd.DataFrame(crop(model.predict(X)), index = X.index)
-
-
-def crop(df):
-    """crop to min and max"""
-
-    df[df > 96] = 96
-    df[df < 0] = 0
-
-    return df
-
+    def build_dir(self):
+        return '%s/%s' % (self.results_dir, self.key)

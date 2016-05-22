@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -16,6 +15,8 @@ import argparse
 import data
 import pipeline
 
+RESULTS_DIR = 'results'
+
 
 def run(config):
     """run the pipeline. """
@@ -24,7 +25,7 @@ def run(config):
         config['train'],
         config['test'],
         config['lookup'],
-        config['predictions']
+        config['results_dir']
     )
 
     p.run()
@@ -36,8 +37,8 @@ def cfg():
     parser = argparse.ArgumentParser(description='learn and predict.')
     parser.add_argument('--train',       default=data.TRAIN_FILE)
     parser.add_argument('--test',        default=data.TEST_FILE)
-    parser.add_argument('--predictions', default=pipeline.PRED_FILE)
     parser.add_argument('--lookup',      default=data.LOOKUP_FILE)
+    parser.add_argument('--results-dir', default=RESULTS_DIR)
 
     return vars(parser.parse_args())
 
