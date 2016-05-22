@@ -43,7 +43,7 @@ def show_img(x, y, axis, color):
     """show an image instance. """
 
     img = x.reshape(SIDE, SIDE)
-    axis.imshow(binary, cmap=plt.cm.gray)
+    axis.imshow(img, cmap=plt.cm.gray)
     axis.scatter(
         y[0::2],
         y[1::2],
