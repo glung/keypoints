@@ -15,8 +15,6 @@ import argparse
 import data
 import pipeline
 
-RESULTS_DIR = 'results'
-
 
 def main(config):
     """run the pipeline. """
@@ -38,7 +36,7 @@ def cfg():
     parser.add_argument('--train',       default=data.TRAIN_FILE)
     parser.add_argument('--test',        default=data.TEST_FILE)
     parser.add_argument('--lookup',      default=data.LOOKUP_FILE)
-    parser.add_argument('--results-dir', default=RESULTS_DIR)
+    parser.add_argument('--results-dir', default=pipeline.RESULTS_DIR)
 
     return vars(parser.parse_args())
 

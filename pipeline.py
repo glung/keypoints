@@ -18,13 +18,16 @@ import json
 import numpy as np
 import pandas as pd
 
+from sklearn import pipeline as skp
 from sklearn import linear_model
 from sklearn import cross_validation
+from sklearn import preprocessing
 
 import features
 import data
 import submit
 
+RESULTS_DIR = 'results'
 PRED_FILE = 'predictions.csv'
 EVAL_FILE = 'evaluation.txt'
 
@@ -36,10 +39,10 @@ class Pipeline():
 
     def __init__(
         self,
-        train_file,
-        test_file,
-        lookup_file,
-        results_dir,
+        train_file = data.TRAIN_FILE,
+        test_file = data.TEST_FILE,
+        lookup_file = data.LOOKUP_FILE,
+        results_dir = RESULTS_DIR,
         key = None):
 
         self.train_file = train_file
@@ -66,7 +69,7 @@ class Pipeline():
         Xtrain, Ytrain, header = data.df_train(self.train_file)
 
         # evaluate model
-        self.evaluate(model, Xtrain, Ytrain)
+        self.evaluate(self.model(), Xtrain, Ytrain)
 
         # train, predict
         estimator = self.train(self.model(), Xtrain, Ytrain)
@@ -80,7 +83,18 @@ class Pipeline():
     def model(self):
         """construct the model. """
 
-        return linear_model.LinearRegression()
+        return skp.Pipeline([
+            ('preprocess', self.preprocessing()),
+            ('regressor', linear_model.LinearRegression())
+        ])
+
+
+    def preprocessing(self):
+        """construct the preprocessing pipeline. """
+
+        return skp.Pipeline([
+            ('scaling', preprocessing.StandardScaler())
+        ])
 
 
     def evaluate(self, model, X, Y):
