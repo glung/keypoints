@@ -15,8 +15,6 @@ __version__ = '0.0.1'
 import matplotlib.pyplot as plt
 import numpy as np
 
-import features
-
 SIDE = 96
 N_SIDE = 6
 
@@ -32,7 +30,7 @@ def show_imgs(X, Y):
 def show_img(x, y, axis):
     """show an image instance. """
 
-    img = features.image_normalize(x).reshape(SIDE, SIDE)
+    img = x.reshape(SIDE, SIDE)
     axis.imshow(img, cmap=plt.cm.gray)
     axis.scatter(y[0::2], y[1::2], marker = '.', s = 10, color = 'red')
 

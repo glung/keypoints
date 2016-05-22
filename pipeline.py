@@ -62,15 +62,25 @@ class Pipeline():
     def run(self):
         """run the pipeline. """
 
+        # data
         Xtrain, Ytrain, header = data.df_train(self.train_file)
-        model = linear_model.LinearRegression()
 
+        # evaluate model
         self.evaluate(model, Xtrain, Ytrain)
-        model = self.train(model, Xtrain, Ytrain)
-        Ypred = self.predict(model, data.df_predict(self.test_file))
 
+        # train, predict
+        estimator = self.train(self.model(), Xtrain, Ytrain)
+        Ypred = self.predict(estimator, data.df_predict(self.test_file))
+
+        # log results
         self.log_evaluation()
         self.submit(header, Ypred)
+
+
+    def model(self):
+        """construct the model. """
+
+        return linear_model.LinearRegression()
 
 
     def evaluate(self, model, X, Y):
