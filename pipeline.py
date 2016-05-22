@@ -23,6 +23,8 @@ from sklearn import linear_model
 from sklearn import cross_validation
 from sklearn import preprocessing
 
+from sklearn.preprocessing import FunctionTransformer
+
 import features
 import data
 import submit
@@ -93,7 +95,7 @@ class Pipeline():
         """construct the preprocessing pipeline. """
 
         return skp.Pipeline([
-            ('scaling', preprocessing.StandardScaler())
+            ('scaling', FunctionTransformer(features.preprocessing))
         ])
 
 
@@ -161,3 +163,4 @@ class Pipeline():
 
     def build_dir(self):
         return '%s/%s' % (self.results_dir, self.key)
+
