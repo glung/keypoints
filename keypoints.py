@@ -18,7 +18,7 @@ import pipeline
 RESULTS_DIR = 'results'
 
 
-def run(config):
+def main(config):
     """run the pipeline. """
 
     p = pipeline.Pipeline(
@@ -45,4 +45,4 @@ def cfg():
 
 if __name__ == '__main__':
     config = cfg()
-    run(config)
+    main(config)

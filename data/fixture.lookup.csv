@@ -1,0 +1,10 @@
+RowId,ImageId,FeatureName,Location
+1,1,left_eye_center_x
+2,1,left_eye_center_y
+3,1,right_eye_center_x
+4,1,right_eye_center_y
+5,1,left_eye_inner_corner_x
+6,1,left_eye_inner_corner_y
+7,1,left_eye_outer_corner_x
+8,1,left_eye_outer_corner_y
+9,1,right_eye_inner_corner_x
