@@ -33,8 +33,8 @@ def df_train(filename = TRAIN_FILE, sample = None):
     return (X, Y, header)
 
 
-def df_test(filename = TEST_FILE):
-    """the test set. """
+def df_predict(filename = TEST_FILE):
+    """the test set provided by kaggle. """
 
     df = pd.read_csv(filename, header = 0, index_col = 'ImageId')
 

@@ -13,17 +13,20 @@ __version__ = '0.0.1'
 
 import os
 import time
+import json
 
 import numpy as np
 import pandas as pd
 
 from sklearn import linear_model
+from sklearn import cross_validation
 
 import features
 import data
 import submit
 
-PRED_FILE = "predictions.csv"
+PRED_FILE = 'predictions.csv'
+EVAL_FILE = 'evaluation.txt'
 
 
 class Pipeline():
@@ -44,6 +47,7 @@ class Pipeline():
         self.lookup_file = lookup_file
         self.results_dir = results_dir
         self.key = key
+        self.seed = 0
 
         if self.key is None:
             self.key = str(time.time())
@@ -59,15 +63,46 @@ class Pipeline():
         """run the pipeline. """
 
         Xtrain, Ytrain, header = data.df_train(self.train_file)
-        model = self.train(Xtrain, Ytrain)
-        Ypred = self.predict(model, data.df_test(self.test_file))
+        model = linear_model.LinearRegression()
+
+        self.evaluate(model, Xtrain, Ytrain)
+        model = self.train(model, Xtrain, Ytrain)
+        Ypred = self.predict(model, data.df_predict(self.test_file))
+
+        self.log_evaluation()
         self.submit(header, Ypred)
 
 
-    def train(self, X, Y):
+    def evaluate(self, model, X, Y):
+       folds = cross_validation.KFold(
+         len(X),
+         n_folds = 10, # 10 is optimal
+         random_state = self.seed
+       )
+
+       scores = cross_validation.cross_val_score(
+           model,
+           X,
+           Y,
+           cv = folds,
+           scoring = 'mean_squared_error')
+
+       rmses = np.sqrt(np.abs(scores))
+       std = np.std(rmses)
+       mean = rmses.mean()
+
+       self.evaluation = {
+           'values': ",".join(map(str, rmses)),
+           'mean': mean,
+           'std': std,
+           'upper_confidence_bound': mean + std,
+           'lower_confidence_bound': mean - std
+       }
+
+
+    def train(self, model, X, Y):
         """train a model. """
 
-        model = linear_model.LinearRegression()
         model.fit(X, Y)
 
         return model
@@ -76,7 +111,9 @@ class Pipeline():
     def predict(self, model, X):
         """predict. """
 
-        return pd.DataFrame(features.crop(model.predict(X)), index = X.index)
+        predictions = model.predict(X)
+
+        return pd.DataFrame(features.crop(predictions), index = X.index)
 
 
     def submit(self, header, Ypred):
@@ -85,6 +122,13 @@ class Pipeline():
         lookup = data.df_lookup(header, self.lookup_file)
         S = submit.submission(Ypred, lookup)
         S.to_csv(self.path(PRED_FILE), index = False)
+
+
+    def log_evaluation(self):
+        """results evaluation file. """
+
+        with open(self.path(EVAL_FILE), 'a') as f:
+            f.write(str(self.evaluation))
 
 
     def path(self, filename):

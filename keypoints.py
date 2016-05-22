@@ -4,7 +4,7 @@
     keypoints
     ~~~~~~~~~
 
-    learn a image facial keypoints.
+    learn facial keypoints.
 
     :license: BSD
 """
