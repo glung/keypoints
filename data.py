@@ -23,9 +23,11 @@ def df_train(filename = TRAIN_FILE, sample = None):
 
     df = pd.read_csv(filename, header = 0)
     if sample is not None:
-        df = df.sample(sample)
+        df = df.sample(n = sample)
 
+    # FIXME(rk): we're throwing away 70% of our data here.
     df = df.dropna()
+
     Y = df.drop('Image', axis = 1)
     X = df['Image'].apply(to_image)
     header = Y.columns.values

@@ -100,26 +100,33 @@ class Pipeline():
         ])
 
 
-    def learning_curves(self, iterations = 10):
+    def learning_curves(self, iterations = 10, sample = None):
         """return learning curves. """
 
         # read
-        Xtrain, Ytrain, header = data.df_train(self.train_file)
+        Xtrain, Ytrain, header = data.df_train(self.train_file, sample)
 
         # learning curve
         train_sizes = np.linspace(
             1,
-            len(Xtrain) - 1,
+            int(len(Xtrain) * 0.9), # account for 10 fold cv,
             num = iterations + 1,
             dtype = np.int)[1:]
 
         # train
-        return learning_curve(
+        train_sizes, train_scores, test_scores = learning_curve(
             self.model(),
             Xtrain,
             Ytrain,
             train_sizes = train_sizes,
-            cv = 10)
+            cv = 10,
+            scoring = 'mean_squared_error')
+
+        return (
+            train_sizes,
+            np.sqrt(np.abs(train_scores)),
+            np.sqrt(np.abs(test_scores)),
+        )
 
 
     def evaluate(self, model, X, Y):
