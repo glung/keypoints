@@ -18,15 +18,16 @@ import json
 import numpy as np
 import pandas as pd
 
-from sklearn import pipeline as skp
-from sklearn import linear_model
 from sklearn import cross_validation
+from sklearn import linear_model
+from sklearn import pipeline as skp
 from sklearn import preprocessing
 
+from sklearn.learning_curve import learning_curve
 from sklearn.preprocessing import FunctionTransformer
 
-import features
 import data
+import features
 import submit
 
 RESULTS_DIR = 'results'
@@ -97,6 +98,28 @@ class Pipeline():
         return skp.Pipeline([
             ('scaling', FunctionTransformer(features.preprocessing))
         ])
+
+
+    def learning_curves(self, iterations = 10):
+        """return learning curves. """
+
+        # read
+        Xtrain, Ytrain, header = data.df_train(self.train_file)
+
+        # learning curve
+        train_sizes = np.linspace(
+            1,
+            len(Xtrain) - 1,
+            num = iterations + 1,
+            dtype = np.int)[1:]
+
+        # train
+        return learning_curve(
+            self.model(),
+            Xtrain,
+            Ytrain,
+            train_sizes = train_sizes,
+            cv = 10)
 
 
     def evaluate(self, model, X, Y):

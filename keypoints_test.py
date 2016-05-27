@@ -40,5 +40,18 @@ def test_integration():
     assert os.path.isfile(p.path(pipeline.PRED_FILE))
 
 
+def test_learning_curves():
+    """test generation of learning curves."""
+
+    p = pipeline.Pipeline(
+        FX_TRAIN,
+        FX_TEST,
+        FX_LOOKUP,
+        RESULTS_DIR
+    )
+
+    data = p.learning_curves()
+
+
 def teardown_module():
     shutil.rmtree(RESULTS_DIR)
