@@ -187,7 +187,7 @@ class Pipeline():
             f.write(str(self.pp_evaluation()))
 
 
-    def pp_evaluation(self):
+    def pp_evaluation(self, fmt = '{0:.3f}', indent = 2):
         """pretty print evaluation. """
 
         values = self.evaluation['values']
@@ -197,14 +197,14 @@ class Pipeline():
         lower_confidence_bound = self.evaluation['lower_confidence_bound']
 
         formatted = {
-           'values': ",".join(map(lambda x: "{0:.4f}".format(x), values)),
-           'mean': "{0:.4f}".format(mean),
-           'std': "{0:.4f}".format(std),
-           'upper_confidence_bound': "{0:.4f}".format(upper_confidence_bound),
-           'lower_confidence_bound': "{0:.4f}".format(lower_confidence_bound)
+           'values': ",".join(map(lambda x: fmt.format(x), values)),
+           'mean': fmt.format(mean),
+           'std': fmt.format(std),
+           'upper_confidence_bound': fmt.format(upper_confidence_bound),
+           'lower_confidence_bound': fmt.format(lower_confidence_bound)
         }
 
-        return json.dumps(formatted, indent = 4)
+        return json.dumps(formatted, indent = indent)
 
 
     def path(self, filename):
