@@ -197,11 +197,11 @@ class Pipeline():
         lower_confidence_bound = self.evaluation['lower_confidence_bound']
 
         formatted = {
-           'values': ",".join(map(lambda x: "%3g" % x, values)),
-           'mean': "%3g" % mean,
-           'std': "%3g" % std,
-           'upper_confidence_bound': "%3g" % upper_confidence_bound,
-           'lower_confidence_bound': "%3g" % lower_confidence_bound
+           'values': ",".join(map(lambda x: "{0:.4f}".format(x), values)),
+           'mean': "{0:.4f}".format(mean),
+           'std': "{0:.4f}".format(std),
+           'upper_confidence_bound': "{0:.4f}".format(upper_confidence_bound),
+           'lower_confidence_bound': "{0:.4f}".format(lower_confidence_bound)
         }
 
         return json.dumps(formatted, indent = 4)
