@@ -38,6 +38,7 @@ def show_imgs(X, Y, color = 'red'):
         ax = fig.add_subplot(N_SIDE, N_SIDE, i + 1, xticks=[], yticks=[])
         show_img(X.iloc[i], Y.iloc[i], ax, color)
 
+
 def show_imgs2(X, Y, color = 'red'):
     """show the first N_SIDE ^ 2 images in X. """
 

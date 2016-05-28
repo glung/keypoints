@@ -148,7 +148,7 @@ class Pipeline():
        mean = rmses.mean()
 
        self.evaluation = {
-           'values': ",".join(map(str, rmses)),
+           'values': rmses,
            'mean': mean,
            'std': std,
            'upper_confidence_bound': mean + std,
@@ -184,7 +184,27 @@ class Pipeline():
         """results evaluation file. """
 
         with open(self.path(EVAL_FILE), 'a') as f:
-            f.write(str(self.evaluation))
+            f.write(str(self.pp_evaluation()))
+
+
+    def pp_evaluation(self):
+        """pretty print evaluation. """
+
+        values = self.evaluation['values']
+        mean = self.evaluation['mean']
+        std = self.evaluation['std']
+        upper_confidence_bound = self.evaluation['upper_confidence_bound']
+        lower_confidence_bound = self.evaluation['lower_confidence_bound']
+
+        formatted = {
+           'values': ",".join(map(lambda x: "%3g" % x, values)),
+           'mean': "%3g" % mean,
+           'std': "%3g" % std,
+           'upper_confidence_bound': "%3g" % upper_confidence_bound,
+           'lower_confidence_bound': "%3g" % lower_confidence_bound
+        }
+
+        return json.dumps(formatted, indent = 4)
 
 
     def path(self, filename):
@@ -193,4 +213,3 @@ class Pipeline():
 
     def build_dir(self):
         return '%s/%s' % (self.results_dir, self.key)
-
