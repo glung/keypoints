@@ -33,7 +33,7 @@ def show_imgs(X, Y, color = 'red'):
     """show the first N_SIDE ^ 2 images in X. """
 
     fig = plt.figure(figsize=(16, 16))
-    for i in range(N_SIDE * N_SIDE):
+    for i in range(min(N_SIDE * N_SIDE, len(X))):
         ax = fig.add_subplot(N_SIDE, N_SIDE, i + 1, xticks=[], yticks=[])
         show_img(X.iloc[i], Y.iloc[i], ax, color)
 
