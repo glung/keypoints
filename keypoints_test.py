@@ -53,5 +53,18 @@ def test_learning_curves():
     data = p.learning_curves()
 
 
+def test_validation_curve():
+    """test generation of validation curve."""
+
+    p = pipeline.Pipeline(
+        FX_TRAIN,
+        FX_TEST,
+        FX_LOOKUP,
+        RESULTS_DIR
+    )
+
+    data = p.validation_curve()
+
+
 def teardown_module():
     shutil.rmtree(RESULTS_DIR)

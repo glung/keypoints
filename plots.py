@@ -20,7 +20,6 @@ SIDE = 96
 N_SIDE = 6
 
 
-# XXX(rk): move to pipeline.
 def show_preprocessed_imgs(p, X, Y, color = 'red'):
     Xpreprocessed = pd.DataFrame(
         p.preprocessing().fit_transform(X),
@@ -37,15 +36,6 @@ def show_imgs(X, Y, color = 'red'):
     for i in range(N_SIDE * N_SIDE):
         ax = fig.add_subplot(N_SIDE, N_SIDE, i + 1, xticks=[], yticks=[])
         show_img(X.iloc[i], Y.iloc[i], ax, color)
-
-
-def show_imgs2(X, Y, color = 'red'):
-    """show the first N_SIDE ^ 2 images in X. """
-
-    fig = plt.figure(figsize=(16, 16))
-    for i in range(N_SIDE * N_SIDE):
-        ax = fig.add_subplot(N_SIDE, N_SIDE, i + 1, xticks=[], yticks=[])
-        show_img(X[i], Y[i], ax, color)
 
 
 def show_img(x, y, axis, color):
@@ -120,3 +110,51 @@ def plot_learning_curves(train_sizes, train_scores, test_scores):
     plt.legend(loc = 'best')
 
     return plt
+
+
+def plot_validation_curve(param_range, train_scores, test_scores):
+    """plot validation curves with respect to Ridge alpha"""
+
+    plt.figure(figsize=(16, 8))
+    plt.title('Validation Curve')
+    plt.xlabel('alpha')
+    plt.ylabel('Score')
+
+    train_scores_mean = np.mean(train_scores, axis = 1)
+    train_scores_std = np.std(train_scores, axis = 1)
+    test_scores_mean = np.mean(test_scores, axis = 1)
+    test_scores_std = np.std(test_scores, axis = 1)
+
+    plt.semilogx(
+        param_range,
+        train_scores_mean,
+        label = 'Training score',
+        color = 'r'
+    )
+
+    plt.fill_between(
+        param_range,
+        train_scores_mean - train_scores_std,
+        train_scores_mean + train_scores_std,
+        alpha = 0.2,
+        color = 'r'
+    )
+
+    plt.semilogx(
+        param_range,
+        test_scores_mean,
+        label = 'Cross-validation score',
+        color = 'g'
+    )
+
+    plt.fill_between(
+        param_range,
+        test_scores_mean - test_scores_std,
+        test_scores_mean + test_scores_std,
+        alpha = 0.2,
+        color = 'g'
+    )
+
+    plt.legend(loc = 'best')
+
+    plt.show()

@@ -23,7 +23,7 @@ from sklearn import linear_model
 from sklearn import pipeline as skp
 from sklearn import preprocessing
 
-from sklearn.learning_curve import learning_curve
+from sklearn.learning_curve import learning_curve, validation_curve
 from sklearn.preprocessing import FunctionTransformer
 
 import data
@@ -33,6 +33,9 @@ import submit
 RESULTS_DIR = 'results'
 PRED_FILE = 'predictions.csv'
 EVAL_FILE = 'evaluation.txt'
+
+CV_FOLDS = 10 # optimal
+TRAINING_FRACTION = 1.0 - 1.0 / CV_FOLDS
 
 
 class Pipeline():
@@ -88,7 +91,7 @@ class Pipeline():
 
         return skp.Pipeline([
             ('preprocess', self.preprocessing()),
-            ('regressor', linear_model.LinearRegression())
+            ('regressor', linear_model.Ridge(alpha = 10000))
         ])
 
 
@@ -100,16 +103,47 @@ class Pipeline():
         ])
 
 
+    def validation_curve(self, sample = None):
+        """generate validation curve. """
+
+        # read
+        Xtrain, Ytrain, header = data.df_train(self.train_file, sample)
+
+        # validation_curve
+        param_range = np.logspace(-2, 8, 30)
+
+        # train
+        train_scores, test_scores = validation_curve(
+            self.model(),
+            Xtrain,
+            Ytrain,
+            param_name = 'regressor__alpha',
+            param_range = param_range,
+            cv = CV_FOLDS,
+            scoring = 'mean_squared_error',
+            n_jobs = 1
+        )
+
+        return (
+            param_range,
+            np.sqrt(np.abs(train_scores)),
+            np.sqrt(np.abs(test_scores)),
+        )
+
+
     def learning_curves(self, iterations = 10, sample = None):
         """return learning curves. """
 
         # read
         Xtrain, Ytrain, header = data.df_train(self.train_file, sample)
 
+        # account for cv folds
+        upper = int(len(Xtrain) * TRAINING_FRACTION)
+
         # learning curve
         train_sizes = np.linspace(
             1,
-            int(len(Xtrain) * 0.9), # account for 10 fold cv,
+            upper,
             num = iterations + 1,
             dtype = np.int)[1:]
 
@@ -119,8 +153,9 @@ class Pipeline():
             Xtrain,
             Ytrain,
             train_sizes = train_sizes,
-            cv = 10,
-            scoring = 'mean_squared_error')
+            cv = CV_FOLDS,
+            scoring = 'mean_squared_error'
+        )
 
         return (
             train_sizes,
@@ -132,7 +167,7 @@ class Pipeline():
     def evaluate(self, model, X, Y):
        folds = cross_validation.KFold(
          len(X),
-         n_folds = 10, # 10 is optimal
+         n_folds = CV_FOLDS, # 10 is optimal
          random_state = self.seed
        )
 
