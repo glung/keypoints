@@ -13,13 +13,27 @@ __version__ = '0.0.1'
 
 import pandas as pd
 import numpy as np
+from sklearn.cross_validation import train_test_split
+import data_sets
 
 TRAIN_FILE = "data/training.csv"
 TEST_FILE = "data/test.csv"
 LOOKUP_FILE = "data/IdLookupTable.csv"
 
 
-def df_train(filename = TRAIN_FILE, sample = None, expand=True):
+def read_data_sets(filename = TRAIN_FILE, sample = None, expand = True):
+    X, y, _ = df_train(filename, sample, expand)
+    X, X_test, y, y_test = train_test_split(X, y, test_size = 0.2)
+    X_train, X_validation, y_train, y_validation = train_test_split(X, y, test_size = 0.2)
+
+    return data_sets.Data_sets(
+        train = data_sets.Data_set(X_train, y_train),
+        test = data_sets.Data_set(X_test, y_test),
+        validation = data_sets.Data_set(X_validation, y_validation)
+    )
+
+
+def df_train(filename = TRAIN_FILE, sample = None, expand = True):
     """the train set. """
 
     df = pd.read_csv(filename, header = 0)
@@ -37,6 +51,7 @@ def df_train(filename = TRAIN_FILE, sample = None, expand=True):
         (X, Y) = df_train_expand(X, Y)
 
     return (X, Y, header)
+
 
 def df_train_expand(X, Y):
     def load2d():
@@ -78,7 +93,7 @@ def df_train_expand(X, Y):
 
         return Y.apply(lambda keypoint : Y[columns_mapping[keypoint.name]].values if columns_mapping.has_key(keypoint.name) else keypoint.values) \
                 .apply(lambda keypoint : 96 - keypoint if keypoint.name.endswith("_x") else keypoint)
-    
+
     X_flipped = images2d_to_dataframe(flip_2d_images_horizontally(load2d()))
     Y_flipped = flip_labels_horizontally()
 
