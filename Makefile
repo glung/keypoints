@@ -9,3 +9,7 @@ notebook:
 .PHONY: test
 test:
 	nosetests --nocapture
+
+.PHONY: run
+run:
+	python nn_connected.py

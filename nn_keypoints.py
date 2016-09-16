@@ -37,7 +37,7 @@ import numpy
 
 # The facial keypoints detection dataset has 30 classes,
 # representing 30 coordinates for 15 keypoints.
-NUM_CLASSES = 30
+NUM_OUTPUT = 30
 
 # The facial keypoints detection images are always 96x96 pixels.
 IMAGE_SIZE = 96
@@ -48,13 +48,16 @@ def inference(images):
     """Build the facial keypoints detection model up to where it may be used for inference.
     """
 
-    with tf.name_scope('layer'):
-        W1 = tf.Variable(
-            tf.truncated_normal([IMAGE_PIXELS, NUM_CLASSES],
-                                stddev = 1.0 / math.sqrt(float(IMAGE_PIXELS))), name = 'weights'
+    with tf.name_scope('perceptron'):
+        # NOTE : maybe it does not converge because classes cannot share
+        # weights
+        weights = tf.Variable(
+            tf.truncated_normal([IMAGE_PIXELS, NUM_OUTPUT],
+                stddev = 1.0 / math.sqrt(float(IMAGE_PIXELS))), 
+            name = 'weights'
         )
-        b1 = tf.Variable(tf.zeros([NUM_CLASSES]), name = 'biases')
-        return tf.matmul(images, W1) + b1
+        biases = tf.Variable(tf.zeros([NUM_OUTPUT]), name = 'biases')
+        return tf.matmul(images, weights) + biases
 
 
 def loss(y_, y):
@@ -62,7 +65,8 @@ def loss(y_, y):
 
     """
 
-    tfLoss = tf.sqrt(tf.reduce_sum(tf.square(y_ - y)))
+    tfLoss = tf.sqrt(tf.reduce_sum(tf.square(y - y_)))
+    #tfLoss = tf.reduce_mean(tf.square(y - y_))
     return tf.Print(tfLoss, [tfLoss], "LOSS:")
 
 
@@ -70,6 +74,7 @@ def training(loss, learning_rate):
     """Sets up the training Ops.
 
     """
+    
     optimizer = tf.train.GradientDescentOptimizer(learning_rate)
     global_step = tf.Variable(0, name = 'global_step', trainable = False)
 

@@ -34,12 +34,12 @@ class FLAGS:
 
 
 IMAGE_PIXELS = 96 * 96
-NUM_CLASSES = 30
+NUM_OUTPUT = 30
 
 
 def placeholder_inputs(batch_size):
     images_placeholder = tf.placeholder(tf.float32, shape = (batch_size, IMAGE_PIXELS))
-    labels_placeholder = tf.placeholder(tf.float32, shape = (batch_size, NUM_CLASSES))
+    labels_placeholder = tf.placeholder(tf.float32, shape = (batch_size, NUM_OUTPUT))
     return images_placeholder, labels_placeholder
 
 
@@ -166,3 +166,5 @@ def run_training():
                         images_placeholder,
                         labels_placeholder,
                         data_sets.test)
+
+run_training()
