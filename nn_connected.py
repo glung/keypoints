@@ -27,7 +27,7 @@ import nn_keypoints
 import data
 
 class FLAGS:
-    learning_rate = 0.01
+    learning_rate = 0.00001
     max_steps = 1000
     batch_size = 100
     train_dir = "tf_dir"

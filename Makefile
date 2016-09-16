@@ -14,6 +14,11 @@ test:
 run:
 	python nn_connected.py
 
-.PHONY: drun
+.PHONY: run_docker
 run_docker:
 	docker run -v /Users/guillaume/Documents/Development/Repositories/keypoints:/tf -it -p 8888:8888 -p 6006:6006 lungos/tensorflow /bin/sh -c 'cd /tf && python nn_connected.py'
+
+.PHONY: start_docker
+start_docker:
+	docker run -v /Users/guillaume/Documents/Development/Repositories/keypoints:/tf -it -p 8888:8888 -p 6006:6006 lungos/tensorflow 
+
