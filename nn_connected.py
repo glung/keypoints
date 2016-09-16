@@ -34,7 +34,7 @@ class FLAGS:
 
 
 IMAGE_PIXELS = 96 * 96
-NUM_OUTPUT = 30
+NUM_OUTPUT = 1
 
 
 def placeholder_inputs(batch_size):
@@ -68,7 +68,7 @@ def fill_feed_dict(data_set, images_pl, labels_pl):
 
     feed_dict = {
         images_pl: images_feed,
-        labels_pl: labels_feed,
+        labels_pl: np.reshape(labels_feed[:,0], (FLAGS.batch_size, NUM_OUTPUT))
     }
     return feed_dict
 
