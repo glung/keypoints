@@ -1,8 +1,6 @@
 *.pyc
 .ipynb_checkpoints/
 results/
-.idea/*
-tf_dir
 checkpoint
-tf_dir.*
-tf_dir*
+.idea
+tf_dir-[0-9]*
