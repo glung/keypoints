@@ -32,11 +32,15 @@ def show_preprocessed_imgs(p, X, Y, color = 'red'):
 def show_imgs(X, Y, color = 'red'):
     """show the first N_SIDE ^ 2 images in X. """
 
+    show_imgs_array(X.iloc, Y.iloc, color)
+
+def show_imgs_array(X, Y, color = 'red'):
+    """show the first N_SIDE ^ 2 images in X. """
+
     fig = plt.figure(figsize=(16, 16))
     for i in range(min(N_SIDE * N_SIDE, len(X))):
         ax = fig.add_subplot(N_SIDE, N_SIDE, i + 1, xticks=[], yticks=[])
-        show_img(X.iloc[i], Y.iloc[i], ax, color)
-
+        show_img(X[i], Y[i], ax, color)
 
 def show_img(x, y, axis, color):
     """show an image instance. """
