@@ -1,3 +1,7 @@
+mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+current_dir := $(dir $(mkfile_path))
+IMG_TENSOR_FLOW := lungos/tensorflow
+
 .PHONY: build
 build:
 	cd data && unzip training.zip && unzip test.zip
@@ -14,11 +18,6 @@ test:
 run:
 	python nn_connected.py
 
-.PHONY: run_docker
-run_docker:
-	docker run -v /Users/guillaume/Documents/Development/Repositories/keypoints:/tf -it -p 8888:8888 -p 6006:6006 lungos/tensorflow /bin/sh -c 'cd /tf && python nn_connected.py'
-
-.PHONY: start_docker
-start_docker:
-	docker run -v /Users/guillaume/Documents/Development/Repositories/keypoints:/tf -it -p 8888:8888 -p 6006:6006 lungos/tensorflow 
-
+.PHONY: start_container
+start_container:
+	docker run -v $(current_dir):/tf -w /tf -it -p 8888:8888 -p 6006:6006 $(IMG_TENSOR_FLOW)
