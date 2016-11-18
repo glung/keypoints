@@ -14,8 +14,12 @@ notebook:
 test:
 	nosetests --nocapture
 
-.PHONY: run
-run:
+.PHONY: run_sk
+run_sk:
+	python keypoints.py
+
+.PHONY: run_nn
+run_nn:
 	python nn_connected.py
 
 .PHONY: start_container
