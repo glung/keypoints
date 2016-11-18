@@ -123,6 +123,9 @@ def run_training():
 
         sess.run(tf.initialize_all_variables())
 
+        # Add ops to save and restore all the variables.
+        saver = tf.train.Saver()
+
         # And then after everything is built, start the training loop.
         for step in xrange(FLAGS.max_steps):
             start_time = time.time()
@@ -166,5 +169,9 @@ def run_training():
                         images_placeholder,
                         labels_placeholder,
                         data_sets.test)
+
+        # Save the variables to disk.
+        save_path = saver.save(sess, "/tmp/model.ckpt")
+        print("Model saved in file: %s" % save_path)
 
 run_training()

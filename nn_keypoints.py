@@ -66,8 +66,9 @@ def loss(y_, y):
     """
 
     tfLoss = tf.sqrt(tf.reduce_sum(tf.square(y - y_)))
-    #tfLoss = tf.reduce_mean(tf.square(y - y_))
-    return tf.Print(tfLoss, [tfLoss], "LOSS:")
+    #tfLoss = tf.reduce_mean(tf.square(y - y_)) ->  was going to INFINITY
+    # tfLoss = tf.Print(tfLoss, [tfLoss], "LOSS:")
+    return tfLoss
 
 
 def training(loss, learning_rate):
