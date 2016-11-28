@@ -1,6 +1,7 @@
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir := $(dir $(mkfile_path))
 IMG_TENSOR_FLOW := lungos/tensorflow
+#'IMG_TENSOR_FLOW := gcr.io/tensorflow/tensorflow:latest-devel
 
 .PHONY: build
 build:
