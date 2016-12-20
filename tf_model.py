@@ -71,13 +71,13 @@ def one_hidden_layer():
     def multilayer_perceptron(x, weights, biases):
         # Hidden layer with RELU activation
         layer_1 = tf.add(tf.matmul(x, weights['h1']), biases['b1'])
-        # layer_1 = tf.nn.relu(layer_1)
+        layer_1 = tf.nn.relu(layer_1)
         # Output layer with linear activation
         out_layer = tf.matmul(layer_1, weights['out']) + biases['out']
         return out_layer
 
     max_iterations = 1000
-    learning_rate = 0.001
+    learning_rate = 0.01
     image_size = 96 * 96
     nb_keypoints = 30
     n_hidden_1 = 100
@@ -91,13 +91,11 @@ def one_hidden_layer():
 
     weights = {
         'h1': tf.Variable(tf.random_normal([image_size, n_hidden_1])),
-        # 'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
         'out': tf.Variable(tf.random_normal([n_hidden_1, nb_keypoints]))
     }
 
     biases = {
         'b1': tf.Variable(tf.random_normal([n_hidden_1])),
-        # 'b2': tf.Variable(tf.random_normal([n_hidden_2])),
         'out': tf.Variable(tf.random_normal([nb_keypoints]))
     }
 
