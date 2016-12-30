@@ -27,7 +27,7 @@ from sklearn.preprocessing import FunctionTransformer
 import data
 import features
 import submit
-import sklearn_model
+import model_linear_regression_sklearn
 
 RESULTS_DIR = 'results'
 PRED_FILE = 'predictions.csv'
@@ -86,7 +86,7 @@ class Pipeline():
 
 
     def model(self):
-        return sklearn_model.linearRigeRegression()
+        return model_linear_regression_sklearn.linearRigeRegression()
 
 
     def preprocessing(self):

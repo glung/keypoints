@@ -2,70 +2,21 @@ import numpy as np
 
 import tensorflow as tf
 from tensorflow.contrib import learn
-
-# TEMPORARY
 from sklearn import preprocessing
+
+import tflearn
+from tflearn.layers.core import input_data, fully_connected, dropout
+from tflearn.layers.conv import conv_2d, max_pool_2d
+from tflearn.layers.normalization import local_response_normalization
+from tflearn.layers.estimator import regression
+from tflearn.data_preprocessing import ImagePreprocessing
 
 import time
 
 
-# NOTES : why is this so slow compared to sklearn ?
-
-def contrib_learn_LinearRegressor():
-    """construct the model. """
-
-    tf.logging.set_verbosity(tf.logging.INFO)
-
-    regressor = learn.LinearRegressor(
-        target_dimension=30,
-        feature_columns=[tf.contrib.layers.real_valued_column(column_name='',
-                                                              dimension=96 * 96,
-                                                              dtype=tf.python.framework.dtypes.float32)],
-        optimizer=tf.train.GradientDescentOptimizer(0.000001),
-        model_dir="/tpm/tf/LinearRegressor" + str(time.time()),
-        config=learn.RunConfig(
-            save_summary_steps=100,
-            save_checkpoints_secs=60
-        )
-    )
-
-    class MyRegressor():
-        def __init__(self):
-            self.x_scaler = preprocessing.StandardScaler(with_std=False)
-            self.y_scaler = preprocessing.StandardScaler(with_std=False)
-
-        def fit(self, x, y):
-            regressor.fit(
-                np.float32(self.x_scaler.fit_transform(x)),
-                np.float32(self.y_scaler.fit_transform(y)),
-                max_steps=1000
-            )
-
-        def predict(self, x):
-            centered = np.float32(self.x_scaler.transform(x))
-            predict = regressor.predict(centered)
-            return self.y_scaler.inverse_transform(predict)
-
-    return MyRegressor()
-
-
-def vanilla_linear_regression():
-    """Vanilla linear regression with TF (by hand)"""
-
-    x = tf.placeholder("float", [None, 96 * 96])
-    y_ = tf.placeholder("float", [None, 30])
-
-    W = tf.Variable(tf.zeros([96 * 96, 30]))
-    b = tf.Variable(tf.zeros([30]))
-    y = tf.matmul(x, W) + b
-
-    loss = tf.reduce_mean(tf.square(y - y_))
-    train_step = tf.train.GradientDescentOptimizer(0.000001).minimize(loss)
-
-    return TFRegressorAdaptor(x, y_, train_step, loss, y)
-
-
 def one_hidden_layer():
+    """ Perceptron w/ one hidden layer """
+    """ /!\ This implementation does not converge """
 
 
     def multilayer_perceptron(x, weights, biases):
@@ -110,10 +61,10 @@ def one_hidden_layer():
     # train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(loss)
     train_step = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss)
 
-    return TFRegressorAdaptor(x, y_, train_step, loss, pred, max_iterations=max_iterations)
+    return PreprocessorAndBatchedRegressor(x, y_, train_step, loss, pred, max_iterations=max_iterations)
 
 
-class TFRegressorAdaptor():
+class PreprocessorAndBatchedRegressor():
     def __init__(self, x, y_, op_train, op_loss, op_predict, max_iterations=100):
         self.placeholder_x = x
         self.placeholder_y_ = y_
