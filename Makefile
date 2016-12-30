@@ -20,9 +20,6 @@ test:
 run_sk:
 	python keypoints.py
 
-.PHONY: run_nn
-run_nn:
-	python nn_connected.py
 
 .PHONY: build_container
 build_image:
