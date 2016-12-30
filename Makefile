@@ -30,4 +30,4 @@ build_image:
 
 .PHONY: start_container
 start_container: 
-	docker run -v $(current_dir):/tf -w /tf -it -p 8888:8888 -p 6006:6006 $(IMG_TENSOR_FLOW)
+	docker run -v $(current_dir):/tf -w /tf -it -p 8888:8888 -p 6006:6006 -e "PASSWORD=" $(IMG_TENSOR_FLOW)
