@@ -18,8 +18,11 @@ test:
 
 .PHONY: run_sk
 run_sk:
-	python keypoints.py
+	python keypoints.py --model SKLEARN_LINEAR_RIGE
 
+.PHONY: run_tf
+run_tf:
+	python tf.py
 
 .PHONY: build_container
 build_image:
@@ -27,4 +30,8 @@ build_image:
 
 .PHONY: start_container
 start_container: 
-	docker run -v $(current_dir):/tf -w /tf -it -p 8888:8888 -p 6006:6006 -e "PASSWORD=" $(IMG_TENSOR_FLOW)
+	docker run -v $(current_dir):/tf -v /tmp:/tmp -w /tf -it -p 8888:8888 -p 6006:6006 -e "PASSWORD=" $(IMG_TENSOR_FLOW)
+
+.PHONY: tensorboard
+tensorboard:
+	tensorboard --logdir target/tflearn_logs/ --port 6007

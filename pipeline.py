@@ -19,7 +19,9 @@ import numpy as np
 import pandas as pd
 
 from sklearn import cross_validation
+from sklearn import linear_model
 from sklearn import pipeline as skp
+from sklearn import preprocessing
 
 from sklearn.learning_curve import learning_curve, validation_curve
 from sklearn.preprocessing import FunctionTransformer
@@ -27,7 +29,6 @@ from sklearn.preprocessing import FunctionTransformer
 import data
 import features
 import submit
-import model_linear_regression_sklearn
 
 RESULTS_DIR = 'results'
 PRED_FILE = 'predictions.csv'
@@ -44,12 +45,14 @@ class Pipeline():
 
     def __init__(
         self,
+        newModel,
         train_file = data.TRAIN_FILE,
         test_file = data.TEST_FILE,
         lookup_file = data.LOOKUP_FILE,
         results_dir = RESULTS_DIR,
         key = None):
 
+        self.newModel = newModel
         self.train_file = train_file
         self.test_file = test_file
         self.lookup_file = lookup_file
@@ -86,7 +89,12 @@ class Pipeline():
 
 
     def model(self):
-        return model_linear_regression_sklearn.linearRigeRegression()
+        """construct the model. """
+
+        return skp.Pipeline([
+            ('preprocess', self.preprocessing()),
+            ('regressor', self.newModel())
+        ])
 
 
     def preprocessing(self):
@@ -188,7 +196,6 @@ class Pipeline():
     def train(self, model, X, Y):
         """train a model. """
 
-        print (X.shape)
         model.fit(X, Y)
 
         return model
@@ -199,7 +206,7 @@ class Pipeline():
 
         predictions = model.predict(X)
 
-        return pd.DataFrame(features.crop(predictions))
+        return pd.DataFrame(features.crop(predictions), index = X.index)
 
 
     def submit(self, header, Ypred):

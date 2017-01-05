@@ -2,13 +2,13 @@ from sklearn import linear_model
 from sklearn import pipeline as skp
 
 
-def linearRegression():
+def model_linear_regression():
     """construct the model. """
 
     return linear_model.LinearRegression()
 
 
-def linearRige():
+def model_linear_rige():
     """construct the model. """
 
     return skp.Pipeline([

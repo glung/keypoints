@@ -4,3 +4,4 @@ results/
 checkpoint
 .idea
 tf_dir-[0-9]*
+target/
